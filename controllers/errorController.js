@@ -20,6 +20,7 @@ const handleValidatonErrorDB = err => {
 };
 
 const sendErrorDev = (err, res) => {
+    console.log('>>>>>>>>>ERROR');
     res.status(err.statusCode).json({
         status: err.status,
         message: err.message,
@@ -35,7 +36,6 @@ const sendErrorProd = (err, res) => {
             message: err.message
         });
     else {
-        console.error('ERROR', err);
         res.status(500).json({
             status: 'error',
             message: 'Something went very wrong'
@@ -53,16 +53,19 @@ module.exports = (err, req, res, next) => {
     err.statusCode = err.statusCode || 500;
     err.status = err.status || 'error';
 
+    console.log('there was an error');
     if (process.env.NODE_ENV === 'development') sendErrorDev(err, res);
     else if (process.env.NODE_ENV === 'production') {
         let error = { ...err };
         if (error.name === 'CastError') error = handleCastErrorDB(error);
         if (error.code === 11000) error = handleDuplicateFieldsDB(error);
-        if (error.name === 'ValidationError')
+        if (error.name === 'ValidationError') {
             error = handleValidatonErrorDB(error);
+        }
         if (error.name === 'JsonWebTokenError') error = handleJWTError();
-        if (error.name === 'TokenExpiredError')
+        if (error.name === 'TokenExpiredError') {
             error = handleTokenExpiredError();
+        }
 
         sendErrorProd(error, res);
     }
