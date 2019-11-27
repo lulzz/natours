@@ -8,8 +8,11 @@ const hpp = require('hpp');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
+
+// routers
 const usersRouter = require('./routes/usersRoutes');
 const toursRouter = require('./routes/toursRoutes');
+const reviewsRouter = require('./routes/reviewRoutes');
 
 const app = express();
 
@@ -65,6 +68,7 @@ app.use((req, res, next) => {
 // routes
 app.use('/api/v1/tours', toursRouter);
 app.use('/api/v1/users', usersRouter);
+app.use('/api/v1/reviews', reviewsRouter);
 
 // not found routes, 404
 app.all('*', (req, res, next) => {

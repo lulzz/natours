@@ -50,7 +50,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
     createSendToken(newUser, 201, res);
 });
 
-exports.loginIn = async (req, res, next) => {
+exports.login = async (req, res, next) => {
     const { email, password } = req.body;
 
     // 1. check for email and password
@@ -104,15 +104,16 @@ exports.protect = catchAsync(async (req, res, next) => {
 
     // grant access to protected route
     req.user = user;
+
     next();
 });
 
 exports.restrictTo = (...roles) => {
     return (req, res, next) => {
+        // roles ['admin', 'lead-guide', "user", "lead-guide"]. role='user'
         if (!roles.includes(req.user.role)) {
             return next(new AppError('Permission denied', 403));
         }
-
         next();
     };
 };

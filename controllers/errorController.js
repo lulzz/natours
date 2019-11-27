@@ -20,7 +20,6 @@ const handleValidatonErrorDB = err => {
 };
 
 const sendErrorDev = (err, res) => {
-    console.log('>>>>>>>>>ERROR');
     res.status(err.statusCode).json({
         status: err.status,
         message: err.message,
