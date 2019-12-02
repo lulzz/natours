@@ -18,6 +18,21 @@ export const login = async (email, password) => {
             window.setTimeout(() => location.assign('/'), 1500);
         }
     } catch (err) {
+        console.log('error from login.js');
         showAlert('error', err.response.data.message);
+    }
+};
+
+export const logout = async () => {
+    console.log('from logout');
+    try {
+        const res = await axios({
+            method: 'GET',
+            url: 'http://127.0.0.1:3000/api/v1/users/logout'
+        });
+        if (res.data.status === 'success') location.reload(true);
+    } catch (err) {
+        console.log(err.response);
+        showAlert('error', 'Error logging out! Try again.');
     }
 };
