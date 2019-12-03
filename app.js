@@ -1,6 +1,6 @@
 const path = require('path');
-const morgan = require('morgan');
 const express = require('express');
+const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
@@ -10,11 +10,9 @@ const cookieParser = require('cookie-parser');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
-
-// routers
-const usersRouter = require('./routes/usersRoutes');
-const toursRouter = require('./routes/toursRoutes');
-const reviewsRouter = require('./routes/reviewRoutes');
+const tourRouter = require('./routes/toursRoutes');
+const userRouter = require('./routes/usersRoutes');
+const reviewRouter = require('./routes/reviewRoutes');
 const viewRouter = require('./routes/viewRoutes');
 
 const app = express();
@@ -22,71 +20,68 @@ const app = express();
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
-// 1. GLOBAL MIDDLEWARES
-
-// serving static files
+// 1) GLOBAL MIDDLEWARES
+// Serving static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// set security http headers
+// Set security HTTP headers
 app.use(helmet());
 
-// development logging
-if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
+// Development logging
+if (process.env.NODE_ENV === 'development') {
+   app.use(morgan('dev'));
+}
 
-// limit requiest from same api
+// Limit requests from same API
 const limiter = rateLimit({
-    max: 100,
-    windowMs: 60 * 60 * 1000,
-    message:
-        'Too many requests from this IP, please try again later in an hour!'
+   max: 100,
+   windowMs: 60 * 60 * 1000,
+   message: 'Too many requests from this IP, please try again in an hour!'
 });
-
 app.use('/api', limiter);
 
-// body parser, reading data from body into req.body
+// Body parser, reading data from body into req.body
 app.use(express.json({ limit: '10kb' }));
-
-// cookie parser, parses data from cookie
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
 
-// data sanitizatioin against NoSQL query injection
+// Data sanitization against NoSQL query injection
 app.use(mongoSanitize());
 
-// data danitization against XSS
+// Data sanitization against XSS
 app.use(xss());
 
-// prevent parameter polution
+// Prevent parameter pollution
 app.use(
-    hpp({
-        whitelist: [
-            'duration',
-            'ratingsQuality',
-            'ratingsAverage',
-            'maxGroupSize',
-            'difficulty',
-            'price'
-        ]
-    })
+   hpp({
+      whitelist: [
+         'duration',
+         'ratingsQuantity',
+         'ratingsAverage',
+         'maxGroupSize',
+         'difficulty',
+         'price'
+      ]
+   })
 );
 
-// testing middleware
+// Test middleware
 app.use((req, res, next) => {
-    req.requestTime = new Date().toISOString();
-    next();
+   req.requestTime = new Date().toISOString();
+   console.log(req.cookies);
+   next();
 });
 
-// routes
+// 3) ROUTES
 app.use('/', viewRouter);
-app.use('/api/v1/tours', toursRouter);
-app.use('/api/v1/users', usersRouter);
-app.use('/api/v1/reviews', reviewsRouter);
+app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
-// not found routes, 404
 app.all('*', (req, res, next) => {
-    next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
-// global middleware for errors
 app.use(globalErrorHandler);
 
 module.exports = app;
