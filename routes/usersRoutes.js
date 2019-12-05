@@ -37,6 +37,7 @@ router.use(protect);
 router.patch('/updateMyPassword', updatePassword);
 router.patch('/updateMe', updateMe);
 router.delete('/deleteMe', deleteMe);
+
 router.get('/me', getMe, getUser);
 
 // restrict all routes to admin after this middleware
