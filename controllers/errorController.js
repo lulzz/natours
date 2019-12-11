@@ -13,7 +13,6 @@ const handleDuplicateFieldsDB = err => {
 };
 
 const handleValidatonErrorDB = err => {
-   console.log('lsdflksdjflksj');
    const errors = Object.values(err.errors).map(el => el.message);
    const message = `Invalid input data. ${errors.join('. ')}`;
    return new AppError(message, 400);
@@ -31,7 +30,6 @@ const sendErrorDev = (err, req, res) => {
    }
 
    //    rendered website
-   console.log('error', err);
 
    return res.status(err.statusCode).render('error', {
       title: 'Something went wrong',
