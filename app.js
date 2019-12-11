@@ -19,6 +19,8 @@ const bookingRouter = require('./routes/bookingRoutes');
 
 const app = express();
 
+app.enable('trust proxy');
+
 // Serving static files
 app.use(express.static(path.join(__dirname, 'public')));
 
