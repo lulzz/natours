@@ -25,7 +25,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
       client_reference_id: req.params.tourID,
 
       //   information about product user want it to purchase
-      display_items: [
+      line_items: [
          {
             name: `${tour.name} Tour`,
             description: tour.summary,
